@@ -5,25 +5,26 @@
 
 #define _COUNTING_SORT(length, start, range, array, sorted, count, GET_KEY) \
     do {                                                                    \
-        memset(count, 0, sizeof(*count) * (range + 1));                     \
+        memset(count, 0, sizeof(*count) * range);                           \
         for (size_t i = 0; i < length; i++) {                               \
-            count[GET_KEY(array, i) - start + 1]++;                         \
+            count[GET_KEY(array, i) - start]++;                             \
         }                                                                   \
-        for (size_t i = 0; i < range; i++) {                                \
+        for (size_t i = 0; i < range - 1; i++) {                            \
             count[i + 1] += count[i];                                       \
         }                                                                   \
-        for (size_t i = 0; i < length; i++) {                               \
-            size_t key = GET_KEY(array, i);                                 \
-            sorted[count[key - start]] = array[i];                          \
-            count[key - start]++;                                           \
+        for (size_t i = length - 1; i != SIZE_MAX; i--) {                   \
+            size_t j = GET_KEY(array, i) - start;                           \
+            count[j]--;                                                     \
+            sorted[count[j]] = array[i];                                    \
         }                                                                   \
     } while (0)
 
 // Define a counting sort function `name` that sorts an array of `T`
 // using the key returned by `GET_KEY(array, i)` for each index `i`
 #define DEF_COUNTING_SORT(T, name, GET_KEY)                                  \
-    void name(size_t length, size_t start, size_t range, T array[length],    \
-              T sorted[length], size_t count[range + 1]) {                   \
+    void name(size_t length, size_t start, size_t range,                     \
+              T array[static length], T sorted[static length],               \
+              size_t count[static range]) {                                  \
         _COUNTING_SORT(length, start, range, array, sorted, count, GET_KEY); \
     }
 
@@ -43,16 +44,17 @@
         range = __end - start + 1;                                       \
     } while (0)
 
-// An allocating version of `DEF_COUNTING_SORT`, with a more convenient interface
-#define DEF_COUNTING_SORT_M(T, name, GET_KEY)                             \
-    bool name(size_t length, T array[length]) {                              \
+// An allocating version of `DEF_COUNTING_SORT`, with a more convenient
+// interface
+#define DEF_COUNTING_SORT_M(T, name, GET_KEY)                                \
+    bool name(size_t length, T array[static length]) {                       \
         size_t start, range;                                                 \
         COUNTING_SORT_GET_START_AND_RANGE(array, length, GET_KEY, start,     \
                                           range);                            \
         T *sorted = malloc(sizeof(T) * length);                              \
         if (!sorted)                                                         \
             return false;                                                    \
-        size_t *count = malloc(sizeof(size_t) * (range + 1));                \
+        size_t *count = malloc(sizeof(size_t) * range);                      \
         if (!count) {                                                        \
             free(sorted);                                                    \
             return false;                                                    \
