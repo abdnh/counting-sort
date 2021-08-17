@@ -5,7 +5,7 @@
 
 // sort by first character
 static inline size_t get_string_key(char *array[], size_t i) {
-    return array[i][0];
+    return (size_t)array[i][0];
 }
 
 static DEF_COUNTING_SORT(char *, string_sort, get_string_key)

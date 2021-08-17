@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define _COUNTING_SORT(length, start, range, array, sorted, count, GET_KEY) \
+#define COUNTING_SORT_(length, start, range, array, sorted, count, GET_KEY) \
     do {                                                                    \
         memset(count, 0, sizeof(*count) * range);                           \
         for (size_t i = 0; i < length; i++) {                               \
@@ -25,7 +25,7 @@
     void name(size_t length, size_t start, size_t range,                     \
               T array[static length], T sorted[static length],               \
               size_t count[static range]) {                                  \
-        _COUNTING_SORT(length, start, range, array, sorted, count, GET_KEY); \
+        COUNTING_SORT_(length, start, range, array, sorted, count, GET_KEY); \
     }
 
 // Use to calculate start index and range if unknown
@@ -59,7 +59,7 @@
             free(sorted);                                                    \
             return false;                                                    \
         }                                                                    \
-        _COUNTING_SORT(length, start, range, array, sorted, count, GET_KEY); \
+        COUNTING_SORT_(length, start, range, array, sorted, count, GET_KEY); \
         memcpy(array, sorted, sizeof(*array) * length);                      \
         free(sorted);                                                        \
         free(count);                                                         \
